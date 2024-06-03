@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-intents = discord.Intents(messages=True, guilds=True) 
+intents = discord.Intents(messages = True, guilds = True, members = True) 
 
 
 intents.message_content = True
@@ -70,4 +70,26 @@ async def delete(interaction:discord.Interaction,channel:discord.TextChannel):
   await channel.delete()
   await interaction.response.send_message("done")
 
-client.run('') # bot
+@client.event
+async def on_member_join(member):
+    guild = member.guild
+    channel = guild.get_channel(1231584560853291028)
+    view = discord.ui.View()
+    button = discord.ui.Button(
+        label = "join",
+        style = discord.ButtonStyle.blurple
+    )
+    button.callback = join_role
+    view.add_item(button)
+    await channel.send(f"Welcome {member.mention} to {guild.name}!",view=view)
+
+async def join_role(interaction: discord.Interaction):
+    guild = interaction.user.guild
+    await interaction.response.edit_message(view = None)
+    channel = guild.get_channel(1231584560853291028)
+    memberRole = interaction.user.roles
+    role = guild.get_role(1231460082911547474)
+    memberRole.append(role)
+    await interaction.user.edit(roles = memberRole)
+
+client.run('token') # bot
